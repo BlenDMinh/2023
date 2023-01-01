@@ -65,7 +65,6 @@ function Firework(pos, size=undefined, color=undefined) {
 
 Firework.prototype.update = function() {
   if(this.lifetime > this.ttl) {
-    print('Destroying!')
     this.particles.forEach(particle => scene.remove(particle.particleObj));
   }
   else
@@ -73,7 +72,6 @@ Firework.prototype.update = function() {
 }
 
 Firework.prototype.draw = function() {
-  console.log('Firework drawing!');
-  this.lifetime += 0.001;
+  this.lifetime += 1;
   this.particles.forEach(particles => particles.draw(1 - this.lifetime/this.ttl))
 }

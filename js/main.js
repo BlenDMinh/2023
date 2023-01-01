@@ -5,7 +5,7 @@ const renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById('main').appendChild(renderer.domElement)
 
-camera.position.z = 5;
+camera.position.z = 15;
 
 // debug light
 const light = new THREE.PointLight(0xffffff, 0.1, 2 );
@@ -66,8 +66,6 @@ line.material = lineMat;
 let fireworks = []
 
 function releaseFireworks(points) {
-    if(fireworks.length > 0)
-        return;
   let stars = points.filter((points, i) => i % starSpace == 0);
   fireworks = fireworks.concat(stars.map(star => new Firework(star)));
 }
@@ -104,7 +102,7 @@ function animate() {
         firework.update()
         firework.draw()
       })
-    //   fireworks = fireworks.filter(firework => firework.ttl < firework.lifetime)
+      fireworks = fireworks.filter(firework => firework.ttl >= firework.lifetime)
     }
 }
 animate();
