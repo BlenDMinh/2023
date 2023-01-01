@@ -60,15 +60,15 @@ const lineMat = new THREE.LineBasicMaterial({
 
 const points = [];
 const interval = 5; // milisecond
+const starSpace = 3;
 var lastTime = null;
 var line =  new THREE.Line();
 line.material = lineMat;
+let fireworks = []
 
 function releaseFireworks(points) {
-    points = points.reverse();
-    for(let point in points) {
-        
-    }
+  let stars = points.filter((points, i) => i % starSpace == 0)
+  fireworks = fireworks.concat(stars.map(star => new Firework(star)))
 }
 
 function animate() {
@@ -96,6 +96,14 @@ function animate() {
         const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
         line.geometry = lineGeo;
         scene.add(line);
+    }
+    if (fireworks.length > 0) {
+      fireworks.forEach(firework => {
+        firework.update()
+        firework.draw()
+      })
+
+      fireworks = fireworks.filter(firework => firework.ttl < firework.lifetime)
     }
 }
 animate();
