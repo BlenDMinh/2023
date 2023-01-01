@@ -28,6 +28,9 @@ function Particle(pos, vel, color=undefined) {
   this.particleGeo = new THREE.SphereGeometry(0.1, 16, 16);
   this.particleObj = new THREE.Mesh(this.particleGeo, this.particleMat);
   this.particleObj.position.set(this.pos.x, this.pos.y, 0);
+  // this.particleLig = new THREE.PointLight(RGB2Hex(this.color), 0.1, 2 );
+  // this.particleLig.position.set(this.pos.x, this.pos.y, 0);
+  // scene.add(this.particleLig);
   scene.add(this.particleObj);
 }
 
@@ -35,6 +38,7 @@ Particle.prototype.update = function() {
   this.vel.add(this.acc)
   this.pos.add(this.vel)
   this.particleObj.position.set(this.pos.x, this.pos.y, 0);
+  // this.particleLig.position.set(this.pos.x, this.pos.y, 0);
 }
 
 // alpha value [0, 1]

@@ -102,7 +102,7 @@ function animate() {
         firework.update()
         firework.draw()
       })
-      fireworks = fireworks.filter(firework => firework.ttl >= firework.lifetime)
+      fireworks = fireworks.filter(firework => firework.ttl > firework.lifetime)
     }
 }
 animate();
