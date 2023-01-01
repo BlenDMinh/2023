@@ -67,7 +67,7 @@ let fireworks = []
 
 function releaseFireworks(points) {
   let stars = points.filter((points, i) => i % starSpace == 0);
-  fireworks = fireworks.concat(stars.map(star => new Firework(star)));
+  fireworks = fireworks.concat(stars.map((star, i) => new Firework(star, 10*i)));
 }
 
 function animate() {
@@ -102,7 +102,7 @@ function animate() {
         firework.update()
         firework.draw()
       })
-      fireworks = fireworks.filter(firework => firework.ttl > firework.lifetime)
+      fireworks = fireworks.filter(firework => firework.particles.length > 0)
     }
 }
 animate();

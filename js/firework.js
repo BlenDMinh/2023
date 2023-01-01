@@ -1,58 +1,93 @@
 // pos: THREE.Vector3
 // size: int
 // color: [r, g, b]
-const HSLToRGB = (h, s, l) => {
-  s /= 100;
-  l /= 100;
-  const k = n => (n + h / 30) % 12;
-  const a = s * Math.min(l, 1 - l);
-  const f = n =>
-    l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
-  return [255 * f(0), 255 * f(8), 255 * f(4)];
-};
-
-const RGB2Hex = function(rgb) {
-  [r, g, b] = rgb;
-  let v = r*256*256 + g*256 + b;
-  return v;
+function HSVtoCLR(h, s, v) {
+  var r, g, b, i, f, p, q, t;
+  if (arguments.length === 1) {
+    s = h.s, v = h.v, h = h.h;
+  }
+  i = Math.floor(h * 6);
+  f = h * 6 - i;
+  p = v * (1 - s);
+  q = v * (1 - f * s);
+  t = v * (1 - (1 - f) * s);
+  switch (i % 6) {
+    case 0: r = v, g = t, b = p; break;
+    case 1: r = q, g = v, b = p; break;
+    case 2: r = p, g = v, b = t; break;
+    case 3: r = p, g = q, b = v; break;
+    case 4: r = t, g = p, b = v; break;
+    case 5: r = v, g = p, b = q; break;
+  }
+  r = Math.round(r * 255)
+  g = Math.round(g * 255)
+  b = Math.round(b * 255)
+  console.log(r, g, b)
+  return (r << 16) + (g << 8) + b
 }
 
-function Particle(pos, vel, color=undefined) {
-  this.pos = pos;
+function boxMullerTransform() {
+  const u1 = Math.random();
+  const u2 = Math.random();
+  
+  const z0 = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+  const z1 = Math.sqrt(-2.0 * Math.log(u1)) * Math.sin(2.0 * Math.PI * u2);
+  
+  return { z0, z1 };
+}
+
+function normaldist(mean=0, stddev=1) {
+  const { z0, _ } = boxMullerTransform();
+  return z0 * stddev + mean;
+}
+
+function Particle(pos, vel, ttl, color=undefined) {
+  this.pos = pos.clone();
   this.vel = vel;
-  this.acc = new THREE.Vector3(0, -.001, 0)
   this.color = color
   if (this.color == undefined)
-    this.color = HSLToRGB(THREE.Math.randInt(0, 360), 100, 100)
-  this.particleMat = new THREE.MeshBasicMaterial({color: RGB2Hex(this.color), transparent: true})
+    this.color = HSVtoCLR(THREE.Math.randFloat(0, 1), 1, 1)
+
+  this.ttl = ttl;
+  this.lifetime = 0;
+  this.started = false;
+}
+
+Particle.prototype.start = function() {
+  this.particleMat = new THREE.MeshBasicMaterial({
+    color: this.color,
+    transparent: true
+  })
+  // console.log(this.color)
   this.particleGeo = new THREE.SphereGeometry(0.1, 16, 16);
   this.particleObj = new THREE.Mesh(this.particleGeo, this.particleMat);
   this.particleObj.position.set(this.pos.x, this.pos.y, 0);
-  // this.particleLig = new THREE.PointLight(RGB2Hex(this.color), 0.1, 2 );
-  // this.particleLig.position.set(this.pos.x, this.pos.y, 0);
-  // scene.add(this.particleLig);
   scene.add(this.particleObj);
+  this.started = true
 }
 
 Particle.prototype.update = function() {
-  this.vel.add(this.acc)
+  if (!this.started)
+    this.start();
   this.pos.add(this.vel)
   this.particleObj.position.set(this.pos.x, this.pos.y, 0);
-  // this.particleLig.position.set(this.pos.x, this.pos.y, 0);
+  this.lifetime += 1
+  if (this.lifetime >= this.ttl)
+    scene.remove(this.particleObj)
 }
 
 // alpha value [0, 1]
 Particle.prototype.draw = function(alpha) {
-  this.particleMat = new THREE.MeshBasicMaterial({color: RGB2Hex(this.color), opacity: alpha, transparent: true})
+  this.particleMat = new THREE.MeshBasicMaterial({color: this.color, opacity: alpha, transparent: true})
 }
 
-function Firework(pos, size=undefined, color=undefined) {
+function Firework(pos, delay=0, size=undefined, color=undefined) {
   this.pos = pos.clone();
   this.size = size;
   if (size == undefined)
-    this.size = size = THREE.Math.randInt(50, 70)
+    this.size = size = THREE.Math.randInt(20, 70)
   this.particles = []
-  for (let i = 0; i < this.size; ++i) {
+  for (let i = 0; i < this.size*2; ++i) {
     let phi = THREE.Math.randFloat(0, 2*Math.PI)
     let theta = THREE.Math.randFloat(0, Math.PI)
     // console.log(phi, theta)
@@ -60,21 +95,28 @@ function Firework(pos, size=undefined, color=undefined) {
     let x = r*Math.cos(phi)*Math.sin(theta)
     let z = r*Math.sin(phi)*Math.sin(theta)
     let y = r*Math.cos(theta)
-    this.particles.push(new Particle(this.pos, new THREE.Vector3(x, y, z)))
+    // console.log(x, y, z)
+    this.particles.push(
+      new Particle(
+        this.pos, 
+        new THREE.Vector3(x, y, z), 
+        normaldist(this.size*2, this.size/10)
+      )
+    )
   }
-  this.ttl = this.size*3;
-  this.lifetime = 0;
+
+  this.delay = delay
   // console.log(this)
 }
 
 Firework.prototype.update = function() {
-  if(this.lifetime > this.ttl)
-    this.particles.forEach(particle => scene.remove(particle.particleObj));
-  else
-    this.particles.forEach(particles => particles.update())
+  this.delay -= 1;
+  if (this.delay >= 0)
+    return;
+  this.particles.forEach(particle => particle.update())
+  this.particles = this.particles.filter(particle => particle.ttl > particle.lifetime)
 }
 
 Firework.prototype.draw = function() {
-  this.lifetime += 1;
-  this.particles.forEach(particles => particles.draw(1 - this.lifetime/this.ttl))
+  this.particles.forEach(particle => particle.draw(1 - this.lifetime/this.ttl))
 }
