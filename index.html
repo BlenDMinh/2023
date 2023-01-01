@@ -33,7 +33,7 @@
             camera.position.z = 5;
 
             // debug light
-            const light = new THREE.PointLight( 0xffffff, 0.1, 5 );
+            const light = new THREE.PointLight( 0xffffff, 1, 100 );
             scene.add(light);
 
             const backPlaneGeo = new THREE.PlaneGeometry(10000, 10000);
@@ -83,7 +83,8 @@
             });
 
             const points = [];
-            const dist = 0.01;
+            const interval = 5; // milisecond
+            var lastTime = null;
             var line =  new THREE.Line();
             line.material = lineMat;
 
@@ -96,14 +97,18 @@
                 light.position.set(mX, mY, 0);
                 renderer.render(scene, camera);
                 if(isMouseDown) {
-                    if(points.length == 0) {
+                    if(lastTime == null) {
+                        lastTime = new Date().getTime();
                         points.push(new THREE.Vector3(mX, mY, 0));
                         return;
                     }
-                    const v = new THREE.Vector3(mX, mY, 0);
-                    if(v.distanceTo(points[points.length - 1]) >= dist)
-                        points.push(v);
+                    let now = new Date().getTime();
+                    if(now - lastTime >= interval) {
+                        points.push(new THREE.Vector3(mX, mY, 0));
+                        lastTime = now;
+                    }
                 } else {
+                    lastTime = null;
                     releaseFireworks(points);
                     points.length = 0;
                     scene.remove(line);
