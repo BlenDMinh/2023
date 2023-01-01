@@ -8,7 +8,7 @@ document.getElementById('main').appendChild(renderer.domElement)
 camera.position.z = 5;
 
 // debug light
-const light = new THREE.PointLight( 0xffffff, 1, 100 );
+const light = new THREE.PointLight( 0xffffff, 0.1, 2 );
 scene.add(light);
 
 const backPlaneGeo = new THREE.PlaneGeometry(10000, 10000);
@@ -43,6 +43,7 @@ document.getElementById('main').addEventListener('mousemove', e => {
         coords = camera.position.clone().add(scaled);
     mX = coords.x;
     mY = coords.y;
+    console.log(mX, mY);
     return coords;
 });
 
@@ -64,7 +65,10 @@ var line =  new THREE.Line();
 line.material = lineMat;
 
 function releaseFireworks(points) {
-    
+    points = points.reverse();
+    for(let point in points) {
+        
+    }
 }
 
 function animate() {
@@ -84,9 +88,9 @@ function animate() {
         }
     } else {
         lastTime = null;
+        scene.remove(line);
         releaseFireworks(points);
         points.length = 0;
-        scene.remove(line);
     }
     if(points.length > 1) {
         const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
