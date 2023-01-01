@@ -24,19 +24,22 @@ function Particle(pos, vel, color=undefined) {
   this.color = color
   if (this.color == undefined)
     this.color = HSLToRGB(THREE.Math.randInt(0, 360), 100, 100)
+  this.particleMat = new THREE.MeshBasicMaterial({color: RGB2Hex(this.color), transparent: true})
+  this.particleGeo = new THREE.SphereGeometry(0.1, 16, 16);
+  this.particleObj = new THREE.Mesh(this.particleGeo, this.particleMat);
+  this.particleObj.position.set(this.pos.x, this.pos.y, 0);
+  scene.add(this.particleObj);
 }
 
 Particle.prototype.update = function() {
   this.vel.add(this.acc)
   this.pos.add(this.vel)
+  this.particleObj.position.set(this.pos.x, this.pos.y, 0);
 }
 
 // alpha value [0, 1]
 Particle.prototype.draw = function(alpha) {
-  this.particleMat = THREE.MeshBasicMaterial({color: RGB2Hex(this.color), opacity: alpha, transparent: true})
-  this.particleGeo = THREE.SphereGeometry(3, 16, 16);
-  this.particleObj = THREE.Mesh(this.particleGeo, this.particleMat);
-  scene.add(this.particleObj);
+  this.particleMat = new THREE.MeshBasicMaterial({color: RGB2Hex(this.color), opacity: alpha, transparent: true})
 }
 
 function Firework(pos, size=undefined, color=undefined) {
@@ -61,10 +64,16 @@ function Firework(pos, size=undefined, color=undefined) {
 }
 
 Firework.prototype.update = function() {
-  this.particles.forEach(particles => particles.update())
+  if(this.lifetime > this.ttl) {
+    print('Destroying!')
+    this.particles.forEach(particle => scene.remove(particle.particleObj));
+  }
+  else
+    this.particles.forEach(particles => particles.update())
 }
 
 Firework.prototype.draw = function() {
-  this.lifetime += 1;
+  console.log('Firework drawing!');
+  this.lifetime += 0.001;
   this.particles.forEach(particles => particles.draw(1 - this.lifetime/this.ttl))
 }

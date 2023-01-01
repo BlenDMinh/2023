@@ -8,7 +8,7 @@ document.getElementById('main').appendChild(renderer.domElement)
 camera.position.z = 5;
 
 // debug light
-const light = new THREE.PointLight( 0xffffff, 0.1, 2 );
+const light = new THREE.PointLight(0xffffff, 0.1, 2 );
 scene.add(light);
 
 const backPlaneGeo = new THREE.PlaneGeometry(10000, 10000);
@@ -43,7 +43,6 @@ document.getElementById('main').addEventListener('mousemove', e => {
         coords = camera.position.clone().add(scaled);
     mX = coords.x;
     mY = coords.y;
-    console.log(mX, mY);
     return coords;
 });
 
@@ -67,9 +66,10 @@ line.material = lineMat;
 let fireworks = []
 
 function releaseFireworks(points) {
+    if(fireworks.length > 0)
+        return;
   let stars = points.filter((points, i) => i % starSpace == 0);
   fireworks = fireworks.concat(stars.map(star => new Firework(star)));
-  
 }
 
 function animate() {
@@ -90,7 +90,8 @@ function animate() {
     } else {
         lastTime = null;
         scene.remove(line);
-        releaseFireworks(points);
+        if(points.length > 0)
+            releaseFireworks(points);
         points.length = 0;
     }
     if(points.length > 1) {
@@ -103,8 +104,7 @@ function animate() {
         firework.update()
         firework.draw()
       })
-
-      fireworks = fireworks.filter(firework => firework.ttl < firework.lifetime)
+    //   fireworks = fireworks.filter(firework => firework.ttl < firework.lifetime)
     }
 }
 animate();
