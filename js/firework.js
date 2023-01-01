@@ -11,6 +11,12 @@ const HSLToRGB = (h, s, l) => {
   return [255 * f(0), 255 * f(8), 255 * f(4)];
 };
 
+const RGB2Hex = function(rgb) {
+  [r, g, b] = rgb;
+  let v = r*256*256 + g*256 + b;
+  return v;
+}
+
 function Particle(pos, vel, color=undefined) {
   this.pos = pos;
   this.vel = vel;
@@ -27,7 +33,10 @@ Particle.prototype.update = function() {
 
 // alpha value [0, 1]
 Particle.prototype.draw = function(alpha) {
-  // code goes here
+  this.particleMat = THREE.MeshBasicMaterial({color: RGB2Hex(this.color), opacity: alpha, transparent: true})
+  this.particleGeo = THREE.SphereGeometry(3, 16, 16);
+  this.particleObj = THREE.Mesh(this.particleGeo, this.particleMat);
+  scene.add(this.particleObj);
 }
 
 function Firework(pos, size=undefined, color=undefined) {

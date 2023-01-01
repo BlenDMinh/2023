@@ -67,8 +67,9 @@ line.material = lineMat;
 let fireworks = []
 
 function releaseFireworks(points) {
-  let stars = points.filter((points, i) => i % starSpace == 0)
-  fireworks = fireworks.concat(stars.map(star => new Firework(star)))
+  let stars = points.filter((points, i) => i % starSpace == 0);
+  fireworks = fireworks.concat(stars.map(star => new Firework(star)));
+  
 }
 
 function animate() {
