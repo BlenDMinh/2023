@@ -131,7 +131,7 @@ Firework.prototype.draw = function() {
   if(!this.light) {
     this.spriteMaterial = new THREE.SpriteMaterial( 
       { 
-        map: new THREE.TextureLoader().load('/images/glow.png'), 
+        map: new THREE.TextureLoader().load('images/glow.png'), 
         color: HSVtoCLR(THREE.MathUtils.randFloat(0, 1), 1, 1), transparent: false, blending: THREE.AdditiveBlending
       });
     this.light = new THREE.Sprite( this.spriteMaterial );
