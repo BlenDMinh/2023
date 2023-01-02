@@ -1,9 +1,22 @@
-const scene = new THREE.Scene();
+import * as THREE from 'three'
+import {EffectComposer} from '/js/three/examples/jsm/postprocessing/EffectComposer.js'
+import { RenderPass } from '/js/three/examples/jsm/postprocessing/RenderPass.js';
+import {BloomPass} from '/js/three/examples/jsm/postprocessing/BloomPass.js'
+import {RenderPixelatedPass} from '/js/three/examples/jsm/postprocessing/RenderPixelatedPass.js'
+import {Firework} from '/js/firework.js';
+
+export const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
 const renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById('main').appendChild(renderer.domElement)
+
+const composer = new EffectComposer(renderer);
+// const renderPass = new RenderPass( scene, camera );
+// composer.addPass( renderPass );
+const renderPixelatePass = new RenderPixelatedPass(4, scene, camera);
+composer.addPass(renderPixelatePass);
 
 camera.position.z = 15;
 
@@ -101,8 +114,9 @@ function animate() {
       fireworks.forEach(firework => {
         firework.update()
         firework.draw()
-      })
+      });
       fireworks = fireworks.filter(firework => firework.particles.length > 0)
     }
+    composer.render();
 }
 animate();
