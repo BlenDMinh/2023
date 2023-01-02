@@ -1,9 +1,9 @@
 import * as THREE from 'three'
-import {EffectComposer} from '/js/three/examples/jsm/postprocessing/EffectComposer.js'
-import { RenderPass } from '/js/three/examples/jsm/postprocessing/RenderPass.js';
-import {BloomPass} from '/js/three/examples/jsm/postprocessing/BloomPass.js'
-import {RenderPixelatedPass} from '/js/three/examples/jsm/postprocessing/RenderPixelatedPass.js'
-import {Firework} from '/js/firework.js';
+import {EffectComposer} from './three/examples/jsm/postprocessing/EffectComposer.js'
+import { RenderPass } from './three/examples/jsm/postprocessing/RenderPass.js';
+import {BloomPass} from './three/examples/jsm/postprocessing/BloomPass.js'
+import {RenderPixelatedPass} from './three/examples/jsm/postprocessing/RenderPixelatedPass.js'
+import {Firework} from './firework.js';
 
 export const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 1000 );
