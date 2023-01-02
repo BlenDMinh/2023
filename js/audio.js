@@ -14,3 +14,5 @@ export function PlayFirework() {
     var audioPath = "audio/firework" + i + ".mp3";
     PlayAudio(audioPath);
 }
+
+PlayLofi()
